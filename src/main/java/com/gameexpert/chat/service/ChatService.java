@@ -5,6 +5,8 @@ import com.gameexpert.chat.event.ChatSavedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import com.gameexpert.chat.repository.ChatMessageRepository;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +19,8 @@ import com.gameexpert.world.repository.WorldRepository;
 import com.gameexpert.world.entity.World;
 
 import lombok.RequiredArgsConstructor;
+
+import static java.util.Comparator.reverseOrder;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +35,8 @@ public class ChatService {
     @Transactional
     public ChatMessageResponse saveMessage(Long worldId, String sender, String content) {
         // TODO Lv 5: 채팅을 저장하고 savedResponse(worldId, saved)의 결과를 반환합니다.
-        throw new UnsupportedOperationException("Lv 5: 채팅 저장을 구현하세요.");
+        World  world = worldRepository.findById(worldId).orElseThrow(() -> new NotFoundException("WORLD_NOT_FOUND"));
+        return savedResponse(worldId, chatMessageRepository.save(new ChatMessage(world, sender, content)));
     }
 
     @Transactional(readOnly = true)
@@ -42,11 +47,22 @@ public class ChatService {
 
         int capped = Math.min(Math.max(limit, 1), MAX_LIMIT);
 
+        //오래된 순서(옛날 → 최신)로 돌려준다, 라고 되어있어서 ID도 이대로 역으로...
         List<ChatMessage> recent = chatMessageRepository
-                .findByWorldIdOrderByCreatedAtDescIdDesc(worldId, PageRequest.of(0, capped));
+                .findByWorldIdOrderByCreatedAtDescIdDesc(worldId, PageRequest.of(0, capped))
+                .reversed();
 
         // TODO Lv 5: recent를 오래된 순서로 바꾸고 응답 DTO 목록으로 반환합니다.
-        return List.of();
+        List<ChatMessageResponse> chatMessageResponses = new ArrayList<>();
+        for (ChatMessage chatMessage : recent) {
+            chatMessageResponses.add(new ChatMessageResponse(
+                    chatMessage.getSenderNickname(),
+                    chatMessage.getContent(),
+                    chatMessage.getCreatedAt()
+            ));
+        }
+
+        return chatMessageResponses;
     }
 
     private ChatMessageResponse savedResponse(Long worldId, ChatMessage saved) {
