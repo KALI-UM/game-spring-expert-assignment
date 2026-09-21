@@ -57,7 +57,7 @@ class OptimisticLockTest {
         }
     }
 
-    // @Test
+    @Test
     void staleTrialSnapshotMustNotOverwriteCommittedProgress() throws Exception {
         CountDownLatch staleSnapshotLoaded = new CountDownLatch(1);
         CountDownLatch freshProgressCommitted = new CountDownLatch(1);
