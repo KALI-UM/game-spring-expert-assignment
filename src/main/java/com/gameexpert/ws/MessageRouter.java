@@ -47,6 +47,8 @@ public class MessageRouter {
             error(context, "INVALID_MESSAGE");
             return;
         }
+
+        //여기서 type을 확인하고, type에 따라 다른 처리를 할 핸들러를 찾는다
         JsonNode typeNode = message.get("type");
         String type = typeNode != null && typeNode.isString() ? typeNode.asString() : null;
         EngineMessageHandler handler = findHandler(type);
