@@ -6,6 +6,14 @@ import lombok.Getter;
 @Getter
 public class OnlineUsersResponse {
     // TODO Lv 15: API 명세에 맞게 응답 필드와 생성자를 완성합니다.
-    public OnlineUsersResponse(List<String> users, int count) {
+
+    private String type;
+    private List<String> users;
+    private int count;
+
+    public OnlineUsersResponse(List<String> users) {
+        type = "onlineUsers";
+        this.users = List.copyOf(users);
+        this.count = this.users.size();
     }
 }
