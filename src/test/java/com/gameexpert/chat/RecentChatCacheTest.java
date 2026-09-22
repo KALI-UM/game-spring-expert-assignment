@@ -52,7 +52,7 @@ class RecentChatCacheTest {
         cache = new RecentChatCache(redis, mapper);
     }
 
-    // @Test
+    @Test
     void readsStoredMessagesAndEmptyListWithoutExtendingTtl() {
         List<ChatMessageResponse> expected = messages("hello");
         redis.opsForValue().set(key(1L, 2), mapper.writeValueAsString(expected), Duration.ofSeconds(2));
@@ -66,7 +66,7 @@ class RecentChatCacheTest {
         assertThat(redis.getExpire(key(1L, 2), TimeUnit.MILLISECONDS)).isBetween(1L, 2_000L);
     }
 
-    // @Test
+     @Test
     void writesMessagesWithFiveSecondTtlAndKeepsOtherKeys() {
         List<ChatMessageResponse> expected = messages("hello");
         redis.opsForValue().set(key(1L, 3), "same-world");
